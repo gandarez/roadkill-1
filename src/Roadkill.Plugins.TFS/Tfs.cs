@@ -56,7 +56,7 @@ namespace Roadkill.Plugins.TFS
             _tfsConfigurationServer = new TfsConfigurationServer(uri, new NetworkCredential(user, pass, domain));
 
             if (_tfsConfigurationServer == null)
-                throw new Exception(string.Format("Unable to connect to TFS Server. ({0}).", _tfsUri.AbsolutePath));
+                throw new Exception(string.Format("Unable to connect to TFS Server. ({0}).", uri.AbsolutePath));
         }
 
         public override void OnInitializeSettings(Settings settings)
