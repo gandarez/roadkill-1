@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.Routing;
 using System.Net;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Framework.Common;
@@ -19,10 +16,9 @@ namespace Roadkill.Plugins.TFS
 {
     public class Tfs : TextPlugin
     {
-        private Roadkill.Core.Database.IRepository _repository;
-        private static Regex _regex = new Regex(@"(?<!{)(?:\{TFS\})(?!})", RegexOptions.Compiled);
-        private static Regex _regex2 = new Regex(@"(?<!{)(?:\{(TFS):([a-zA-Z]+)\})(?!})", RegexOptions.Compiled);
-        private readonly Uri _tfsUri = new Uri("http://SERVER:8080/tfs");
+        private readonly IRepository _repository;
+        private static readonly Regex Regex = new Regex(@"(?<!{)(?:\{TFS\})(?!})", RegexOptions.Compiled);
+        private static readonly Regex Regex2 = new Regex(@"(?<!{)(?:\{(TFS):([a-zA-Z]+)\})(?!})", RegexOptions.Compiled);        
         private TfsConfigurationServer _tfsConfigurationServer;
 
         public override string Id
@@ -45,24 +41,37 @@ namespace Roadkill.Plugins.TFS
             get { return "1.0.0"; }
         }
 
-        public Tfs(Roadkill.Core.Database.IRepository repository)
+        public Tfs(IRepository repository)
         {
             _repository = repository;
         }
 
         private void ConnectToTfs()
         {
-            _tfsConfigurationServer = new TfsConfigurationServer(_tfsUri, new NetworkCredential("dev", "fator@123", "FSP-SRV-TFS-P01"));
+            var uri = new Uri(Settings.GetValue("TFS-ADDRESS"));
+            var user = Settings.GetValue("TFS-USER");
+            var pass = Settings.GetValue("TFS-PASSWORD");
+            var domain = Settings.GetValue("TFS-CREDENTIAL-DOMAIN");
+
+            _tfsConfigurationServer = new TfsConfigurationServer(uri, new NetworkCredential(user, pass, domain));
 
             if (_tfsConfigurationServer == null)
                 throw new Exception(string.Format("Unable to connect to TFS Server. ({0}).", _tfsUri.AbsolutePath));
+        }
+
+        public override void OnInitializeSettings(Settings settings)
+        {
+            settings.SetValue("TFS-ADDRESS", "http://SERVER:8080/tfs");
+            settings.SetValue("TFS-USER", "dev");
+            settings.SetValue("TFS-PASSWORD", "pass");
+            settings.SetValue("TFS-CREDENTIAL-DOMAIN", "domain.com");
         }
 
         private void HandleCollections(ref string html)
         {
             try
             {
-                var match = _regex.Match(html);
+                var match = Regex.Match(html);
                 if (!match.Success) return;
 
                 ConnectToTfs();
@@ -97,11 +106,11 @@ namespace Roadkill.Plugins.TFS
                             string.Format("{0} {1}", collection.Resource.DisplayName, collection.Resource.Description), teamProjectsCount);
                 }
                 sb.AppendLine("</ul>");
-                html = _regex.Replace(html, sb.ToString());
+                html = Regex.Replace(html, sb.ToString());
             }
             catch (Exception e)
             {
-                html = _regex.Replace(html, e.Message);
+                html = Regex.Replace(html, e.Message);
             }
         }
 
@@ -109,36 +118,40 @@ namespace Roadkill.Plugins.TFS
         {
             try
             {
-                var match = _regex2.Match(html);
+                var match = Regex2.Match(html);
                 if (!match.Success) return;
 
                 var collectionName = match.Groups[2].Value;
 
                 ConnectToTfs();
-                
+
                 var collectionNodes = _tfsConfigurationServer.CatalogNode.QueryChildren(
                         new[] { CatalogResourceTypes.ProjectCollection },
                         false, CatalogQueryOptions.None);
-                var teamProjects = collectionNodes.First(p => p.Resource.DisplayName == collectionName).QueryChildren(new[] { CatalogResourceTypes.TeamProject }, false, CatalogQueryOptions.IncludeParents).OrderBy(p => p.Resource.DisplayName);
+                var teamProjects =
+                    collectionNodes.First(p => p.Resource.DisplayName == collectionName)
+                        .QueryChildren(new[] {CatalogResourceTypes.TeamProject}, false,
+                            CatalogQueryOptions.IncludeParents)
+                        .OrderBy(p => p.Resource.DisplayName);
 
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine("<ul id=\"tfs\">");
                 foreach (var teamProject in teamProjects)
-                {                  
-                    var description = teamProject.Resource.Description.StartsWith("-") 
-                        ? teamProject.Resource.Description 
-                        : string.IsNullOrEmpty(teamProject.Resource.Description) 
-                            ? string.Empty 
+                {
+                    var description = teamProject.Resource.Description.StartsWith("-")
+                        ? teamProject.Resource.Description
+                        : string.IsNullOrEmpty(teamProject.Resource.Description)
+                            ? string.Empty
                             : string.Concat("- ", teamProject.Resource.Description);
 
                     sb.AppendFormat("<li>{0} {1}</li>", teamProject.Resource.DisplayName, description);
                 }
                 sb.AppendLine("</ul>");
-                html = _regex2.Replace(html, sb.ToString());
+                html = Regex2.Replace(html, sb.ToString());
             }
             catch (Exception e)
             {
-                html = _regex.Replace(html, e.Message);
+                html = Regex.Replace(html, e.Message);
             }
         }
 
