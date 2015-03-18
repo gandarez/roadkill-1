@@ -96,7 +96,7 @@ namespace Roadkill.Plugins.TFS
                     if (page == null)
                         sb.AppendFormat("<li>{0} {1} ({2} project(s))</li>", collection.Resource.DisplayName, collection.Resource.Description, teamProjectsCount);
                     else
-                        sb.AppendFormat("<li><a href=\"{0}\">{1}</a> ({2} projects(s))</li>",
+                        sb.AppendFormat("<li><a href=\"{0}\">{1}</a> ({2} project(s))</li>",
                             helper.Action("Index", "Wiki", new
                             {
                                 id = page.Id,
