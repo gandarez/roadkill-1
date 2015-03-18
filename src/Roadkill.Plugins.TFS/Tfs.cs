@@ -7,7 +7,6 @@ using System.Web.Mvc;
 using System.Net;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Framework.Common;
-using Microsoft.TeamFoundation.Framework.Client;
 using Roadkill.Core.Database;
 using Roadkill.Core.Mvc.ViewModels;
 using Roadkill.Core.Plugins;
@@ -18,7 +17,7 @@ namespace Roadkill.Plugins.TFS
     {
         private readonly IRepository _repository;
         private static readonly Regex Regex = new Regex(@"(?<!{)(?:\{TFS\})(?!})", RegexOptions.Compiled);
-        private static readonly Regex Regex2 = new Regex(@"(?<!{)(?:\{(TFS):([a-zA-Z]+)\})(?!})", RegexOptions.Compiled);        
+        private static readonly Regex Regex2 = new Regex(@"(?<!{)(?:\{(TFS):([a-zA-Z]+)\})(?!})", RegexOptions.Compiled);
         private TfsConfigurationServer _tfsConfigurationServer;
 
         public override string Id
@@ -82,8 +81,8 @@ namespace Roadkill.Plugins.TFS
 
                 var pages = _repository.FindPagesContainingTag("tfs");
 
-                UrlHelper helper = new UrlHelper(HttpContext.Current.Request.RequestContext);
-                StringBuilder sb = new StringBuilder();
+                var helper = new UrlHelper(HttpContext.Current.Request.RequestContext);
+                var sb = new StringBuilder();
                 sb.AppendLine("<ul id=\"tfs\">");
 
                 foreach (var collection in collectionNodes)
@@ -95,9 +94,9 @@ namespace Roadkill.Plugins.TFS
                     var page = pages.FirstOrDefault(p => p.Title == string.Format("TFS {0}", collection.Resource.DisplayName));
 
                     if (page == null)
-                        sb.AppendFormat("<li>{0} {1} ({2} projeto(s))</li>", collection.Resource.DisplayName, collection.Resource.Description, teamProjectsCount);
+                        sb.AppendFormat("<li>{0} {1} ({2} project(s))</li>", collection.Resource.DisplayName, collection.Resource.Description, teamProjectsCount);
                     else
-                        sb.AppendFormat("<li><a href=\"{0}\">{1}</a> ({2} projeto(s))</li>",
+                        sb.AppendFormat("<li><a href=\"{0}\">{1}</a> ({2} projects(s))</li>",
                             helper.Action("Index", "Wiki", new
                             {
                                 id = page.Id,
@@ -130,11 +129,11 @@ namespace Roadkill.Plugins.TFS
                         false, CatalogQueryOptions.None);
                 var teamProjects =
                     collectionNodes.First(p => p.Resource.DisplayName == collectionName)
-                        .QueryChildren(new[] {CatalogResourceTypes.TeamProject}, false,
+                        .QueryChildren(new[] { CatalogResourceTypes.TeamProject }, false,
                             CatalogQueryOptions.IncludeParents)
                         .OrderBy(p => p.Resource.DisplayName);
 
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
                 sb.AppendLine("<ul id=\"tfs\">");
                 foreach (var teamProject in teamProjects)
                 {

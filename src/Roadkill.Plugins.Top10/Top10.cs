@@ -1,6 +1,5 @@
 ﻿#region
 
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -16,8 +15,8 @@ namespace Roadkill.Plugins.Top10
 {
 	public class Top10 : TextPlugin
 	{
-		private IRepository _repository;
-		private static Regex _regex = new Regex(@"(?<!{)(?:\{Top10\})(?!})", RegexOptions.Compiled);
+		private readonly IRepository _repository;
+		private static readonly Regex Regex = new Regex(@"(?<!{)(?:\{Top10\})(?!})", RegexOptions.Compiled);
 
 		public override string Id
 		{
@@ -39,42 +38,39 @@ namespace Roadkill.Plugins.Top10
 			get { return "1.0.0"; }
 		}
 
-		public Top10(IRepository repository) : base()
+		public Top10(IRepository repository)
 		{
 			_repository = repository;
 		}
 
         public override void OnInitializeSettings(Settings settings)
         {
-            settings.SetValue("Quantity", "10", SettingFormType.Textbox);
+            settings.SetValue("Quantity", "10");
         }
 
 		public override string AfterParse(string html)
 		{
-            var match = _regex.Match(html);
+            var match = Regex.Match(html);
             if (!match.Success) return html;
 
-            int qty = 10;
+            var qty = 10;
             int.TryParse(Settings.GetValue("Quantity"), out qty);
 
-			List<Page> topPages = _repository.AllPages().OrderByDescending(p => p.ModifiedOn).Take(10).ToList();
-			if (topPages.Count == 0) return _regex.Replace(html, string.Empty);
+			var topPages = _repository.AllPages().OrderByDescending(p => p.ModifiedOn).Take(10).ToList();
+			if (topPages.Count == 0) return Regex.Replace(html, string.Empty);
 
-			UrlHelper helper = new UrlHelper(HttpContext.Current.Request.RequestContext);
-			StringBuilder sb = new StringBuilder();
+			var helper = new UrlHelper(HttpContext.Current.Request.RequestContext);
+			var sb = new StringBuilder();
 
 			sb.AppendLine("<ol class=\"clear\">");
-			foreach (Page page in topPages) {
-				sb.AppendFormat("<li><a href=\"{0}\">{1}</a> <span class=\"smaller\">{2} {3}</span></li>", new object[] {
-					helper.Action("Index", "Wiki", new {
-						id = page.Id,
-						title = PageViewModel.EncodePageTitle(page.Title)
-					}),
-					page.Title, page.ModifiedOn.ToLongDateString(), page.ModifiedOn.ToShortTimeString()
-				});
+			foreach (var page in topPages) {
+				sb.AppendFormat("<li><a href=\"{0}\">{1}</a> <span class=\"smaller\">{2} {3}</span></li>", helper.Action("Index", "Wiki", new {
+				    id = page.Id,
+				    title = PageViewModel.EncodePageTitle(page.Title)
+				}), page.Title, page.ModifiedOn.ToLongDateString(), page.ModifiedOn.ToShortTimeString());
 			}
 			sb.AppendLine("</ol>");
-			return _regex.Replace(html, sb.ToString());
+			return Regex.Replace(html, sb.ToString());
 		}
 	}
 }
