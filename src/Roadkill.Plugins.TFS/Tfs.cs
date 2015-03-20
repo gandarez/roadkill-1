@@ -32,7 +32,7 @@ namespace Roadkill.Plugins.TFS
 
         public override string Description
         {
-            get { return "Rturn a list of TFS collections. Usage {TFS}. To get a list of Team Projects please refer to: {TFS:TeamProjectName}."; }
+            get { return "Return a list of TFS collections. Usage {TFS}. To get a list of Team Projects please refer to: {TFS:TeamProjectName}."; }
         }
 
         public override string Version
