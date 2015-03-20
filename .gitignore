@@ -84,3 +84,6 @@ deploytemp/
 
 # Ignore all exported files
 src/Roadkill.Web/App_Data/Export/
+/src/Roadkill.Web/Plugins/Top10/Roadkill.Plugins.Top10.dll
+/src/Roadkill.Web/Plugins/Top10/Roadkill.Plugins.Top10.dll.config
+/src/Roadkill.Web/Plugins/Top10/Roadkill.Plugins.Top10.pdb
