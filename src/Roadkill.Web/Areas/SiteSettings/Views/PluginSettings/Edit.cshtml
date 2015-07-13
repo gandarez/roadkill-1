@@ -1,5 +1,4 @@
-﻿@using Roadkill.Core.Plugins
-@model PluginViewModel
+﻿@model PluginViewModel
 
 @{
     string title = string.Format(SiteStrings.SiteSettings_Plugins_Edit_Title, Model.Name);
@@ -26,23 +25,23 @@
 	    {
 		    <div>
                 <label for="SettingValues[@i].Value">@Model.SettingValues[i].Name</label>
-                    
-                <input type="hidden" name="SettingValues[@i].Name" value="@Model.SettingValues[i].Name" />
-                @switch (@Model.SettingValues[i].FormType)
+
+		        <input type="hidden" name="SettingValues[@i].Name" value="@Model.SettingValues[i].Name"/>
+                @switch (Model.SettingValues[i].FormType)
                 {
-                    case SettingFormType.Textbox:
-                        <input type="text" name="SettingValues[@i].Value" value="@Model.SettingValues[i].Value"/>
-                        break;
                     case SettingFormType.Checkbox:
-                        <input type="checkbox" name="SettingValues[@i].Value"  @Html.Raw(Model.SettingValues[i].Value.ToLower() == "on" ? "checked='checked'" : "") />
-                        break;
-					case SettingFormType.Password:
-                        <input type="password" name="SettingValues[@i].Value" value="@Model.SettingValues[i].Value"/>
+                        @Html.CheckBox(String.Format("SettingValues[{0}].Value", i), bool.Parse(Model.SettingValues[i].Value));
                         break;
                     case SettingFormType.Textarea:
-                        <textarea rows="3" cols="20">@Model.SettingValues[i].Value</textarea>
+                        <textarea rows="5" cols="25" name="SettingValues[@i].Value">Model.SettingValues[i].Value</textarea>
                         break;
-                }       
+                    case SettingFormType.Password:
+                        <input type="password" name="SettingValues[@i].Value" value="@Model.SettingValues[i].Value"/>
+                        break;
+                    default:
+                        <input type="text" name="SettingValues[@i].Value" value="@Model.SettingValues[i].Value"/>
+                        break;
+                }
 		    </div>
 	    }
     </fieldset>

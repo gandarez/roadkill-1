@@ -354,6 +354,7 @@
     <Compile Include="Integration\Repository\LightSpeed\LightSpeedPageRepositoryTests.cs" />
     <Compile Include="Integration\Repository\LightSpeed\LightSpeedSettingsRepositoryTests.cs" />
     <Compile Include="Setup\ConfigFileManager.cs" />
+    <Compile Include="Setup\EnvironmentalVariables.cs" />
     <Compile Include="Setup\IISExpress.cs" />
     <Compile Include="Setup\SqlExpressSetup.cs" />
     <Compile Include="Integration\Repository\MongoDb\MongoDbSettingsRepositoryTests.cs" />
@@ -386,7 +387,7 @@
     <Compile Include="Unit\Extensions\ExtensionsTests.cs" />
     <Compile Include="Unit\Import\ScrewTurnImportExtensionTests.cs" />
     <Compile Include="Unit\MvcActionExtensions.cs" />
-    <Compile Include="Unit\Import\WikiExporterTests.cs" />
+    <Compile Include="Unit\Export\WikiExporterTests.cs" />
     <Compile Include="Unit\Mvc\Attributes\OptionalAuthorizationTests.cs" />
     <Compile Include="Unit\Mvc\Attributes\EditorRequiredAttributeTests.cs" />
     <Compile Include="Unit\Mvc\Attributes\WebApiEditorRequiredAttributeTests.cs" />

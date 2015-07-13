@@ -1,0 +1,23 @@
+version: 2.0.{build}
+shallow_clone: true
+clone_depth: 1
+
+services: 
+  - mssql2012sp1
+
+environment:
+  ConnectionString: Server=(local)\SQL2012SP1;Database=master;User ID=sa;Password=Password12!
+  
+install:
+  -ps: >- 
+    .\build\appveyor\install-mongodb.ps1
+
+build:
+  project: Roadkill.sln
+  parallel: true
+  verbosity: normal
+  
+test:
+  categories:
+    - Unit
+    - Integration
